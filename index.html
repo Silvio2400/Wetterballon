@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js" type="text/javascript" charset="utf-8"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js" type="text/javascript" charset="utf-8"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-data.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+    <style>
+      .container {
+        width: 100%;
+      }
+      .mapcontainer {
+        height: 480px;
+        background-color: darkgray;
+        min-width: 200px;
+        max-width: 640px;
+      }
+      .senstext {
+        font-family: Roboto,HelveticaNeue,Arial,sans-serif;
+        font-weight: bold;
+        font-size: 1em;
+        color: black;
+      }
+      .sensvalue {
+        font-family: Roboto,HelveticaNeue,Arial,sans-serif;
+        font-weight: bold;
+        font-size: 1em;
+        color: black;
+      }
+      table {
+        table-layout: auto;
+        max-width: 640px;
+        min-width: 200px;
+        width: 100%;
+      }
+      table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 10px;
+      }
+      th {
+        text-align: left;
+      }
+      tr:nth-child(even) {
+        background-color: #cccccc;
+      }
+      tr:nth-child(odd) {
+        background-color: #aaaaaa;
+      }
+      a.link {
+        color: #0d70f2;
+        height: 39px;
+        width: 640px;
+        text-align: center;
+        vertical-align: middle;
+        display: table-cell;
+        font-family: sans-serif;
+        text-decoration: none;
+        outline: 1px solid black;
+        outline-offset: -1px;
+        min-width: 200px;
+      }
+      .linkdiv {
+        max-width: 640px;
+        min-width: 200px;
+        width: 100%;
+        background-color: #d6d6d6;
+        height: auto;
+        min-height: 39px;
+      }
+      .warndiv {
+        height: auto;
+        min-height: 39px;
+        background-color: yellow;
+        margin-bottom: 10px;
+        max-width: 640px;
+        min-width: 200px;
+        overflow: hidden;
+      }
+      .warntext {
+        color: black;
+        height: 39px;
+        width: 640px;
+        text-align: center;
+        vertical-align: middle;
+        font-family: sans-serif;
+        min-width: 200px;
+        display: table-cell;
+        font-weight: bold;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body onload="loadmap();" style="background-color: grey;">
+    <div class="container">
+      <div>
+        <div class="warndiv" WARNING_HIDDEN>
+          <span class="warntext">Warning: no connection to device</span>
+        </div>
+        <div class="mapcontainer" id="mapContainer"></div>
+        <table>
+          SENSOR_VALUES
+        </table>
+        <div class="linkdiv">
+          <a target="_blank" class="link" href="https://www.google.com/maps/search/?api=1&query=DEST_LNG,DEST_LAT">Destination ( DEST_DATETIME )</a>
+        </div>
+        <div class="linkdiv">
+          <a class="link" href="/plan.kml" download>Download KML</a>
+        </div>
+      </div>
+    </div>
+    <script>
+      function loadmap() {
+        // Initialize the platform object:
+        var platform = new H.service.Platform({
+          'apikey': 'rY7v9hAofqpnLRyHlSoWsZPAo-OxVDWfSr8lbV24MF8'
+        });
+
+        // Obtain the default map types from the platform object
+        var maptypes = platform.createDefaultLayers();
+
+        // Instantiate (and display) a map object:
+        var map = new H.Map(
+          document.getElementById('mapContainer'),
+          maptypes.vector.normal.map,
+          {
+            zoom: 9,
+            center: { lng: CENTER_LNG, lat: CENTER_LAT },
+            pixelRatio: 3
+          }
+        );
+        
+        // Create reader object initializing it with a document:
+        var reader = new H.data.kml.Reader('plan.kml');
+
+        // Parse the document:
+        reader.parse();
+          
+
+        // Get KML layer from the reader object and add it to the map:
+        layer = reader.getLayer();
+        map.addLayer(layer);
+        
+        var defaultLayers = platform.createDefaultLayers();
+
+        var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+
+        // KML objects receive regular map events, so add an event listener to the 
+        // KML layer:
+        layer.getProvider().addEventListener('tap', function(ev) {
+            // Log map object data. They contain name, description (if present in 
+            // KML) and the KML node itself.
+            console.log(ev.target.getData());
+        });
+      }
+    </script>
+  </body>
+</html>
