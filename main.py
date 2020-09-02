@@ -112,7 +112,7 @@ def avg(l:List[float]) -> float:
         t += i
     return t / len(l)
 
-def setlastdata(key:str, value:Union[str, APRSLocation, APRSWeather]) -> NoReturn:
+def setlastdata(key:str, value:Union[str, APRSLocation, APRSWeather]) -> None:
     f = open("lastdata.json", "r")
     dat:str = f.read()
     f.flush()
@@ -437,9 +437,35 @@ class ReqHandler(SimpleHTTPRequestHandler):
         if self.path.startswith("/submitcoords"):
             try:
                 lat = query_components["lat"]
-                lon = query_components["loc"]
-            except KeyError: print("Invalid query components:", query_components)
+                lng = query_components["lng"]
+            except KeyError:
+                print("Invalid query components:", query_components)
+                return
+            try:
+                lat = float(lat)
+                lng = float(lng)
+            except:
+                print("Invalid query components:", query_components)
+                return
+
             
+            f = open("lastdata.json", "r")
+            dat:str = f.read()
+            f.flush()
+            f.close()
+
+            datadec = jsondec.decode(dat)
+
+            datadec["loc"]["lat"] = str(lat)
+            datadec["loc"]["lng"] = str(lng)
+            
+            dat = jsonenc.encode(datadec)
+
+            f = open("lastdata.json", "w")
+            f.write(dat)
+            f.flush()
+            f.close()
+
 
 
 
