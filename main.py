@@ -461,6 +461,8 @@ class ReqHandler(SimpleHTTPRequestHandler):
             
             dat = jsonenc.encode(datadec)
 
+            logdata(datadec["loc"], None)
+
             f = open("lastdata.json", "w")
             f.write(dat)
             f.flush()
@@ -478,25 +480,29 @@ lastloc =  dec["loc"]
 lastwx =   dec["wx"]
 lastuuid = dec["uuid"]
 
-def logger() -> NoReturn:
+
+def logdata(loc,wx) -> None:
+    f = open("logfile.json", "r")
+    dat = f.read()
+    f.flush()
+    f.close()
+
+    dec = jsondec.decode(dat)
+    apnd = [loc,wx] if logloc and logwx else [loc] if logloc and not logwx else [wx] if logwx and not logloc else []
+    dec.append(apnd)
+    dat = jsonenc.encode(dec)
+
+    f = open("logfile.json", "w")
+    f.write(dat)
+    f.flush()
+    f.close()
+
+def logger():
     while True:
         sleep(loggingdelay)
         loc,wx = gettransmitterinfo()
-
-        f = open("logfile.json", "r")
-        dat = f.read()
-        f.flush()
-        f.close()
-
-        dec = jsondec.decode(dat)
-        apnd = [loc,wx] if logloc and logwx else [loc] if logloc and not logwx else [wx] if logwx and not logloc else []
-        dec.append(apnd)
-        dat = jsonenc.encode(dec)
-
-        f = open("logfile.json", "w")
-        f.write(dat)
-        f.flush()
-        f.close()
+        logdata(loc,wx)
+        
 
 
 f = open("logfile.json", "w")
