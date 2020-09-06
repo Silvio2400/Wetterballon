@@ -23,6 +23,7 @@ donotchange_descent:bool  = False # true if should not change descent according 
 balloon_burst:float       = 30000 # m     relative to sea level
 # -------------------------------------------------------------- #
 
+from datetime import date
 import json
 from http.server import SimpleHTTPRequestHandler
 from urllib import request
@@ -59,7 +60,8 @@ lastdataupdatetime = None
 
 going:int = UP
 lastalt:float = 0.0
-lasttime:datetime.datetime = datetime.datetime.now()
+neg_20_sec = datetime.timedelta(seconds=-20)
+lasttime:datetime.datetime = datetime.datetime.now() + neg_20_sec
 
 lastuuid:str = ""
 lastloc:Optional[APRSLocation] =  None
@@ -520,6 +522,9 @@ if logloc or logwx:
 handler:ReqHandler = ReqHandler
 with socketserver.TCPServer(("", port), handler) as httpd:
     print("serving at port", port)
-    httpd.serve_forever()
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        httpd.shutdown()
 
 
