@@ -7,7 +7,7 @@ clearlog:bool =     True  # Clear log on startup
 
 # API Transmitter Info
 apikey:str = "146300.CJTqvO2lYIQu1w"
-name:str   = "HB9TPR"
+name:str   = "HB9FWH"
 
 # Webserver
 port:int = 80
