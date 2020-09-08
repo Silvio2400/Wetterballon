@@ -10,7 +10,7 @@ apikey:str = "146300.CJTqvO2lYIQu1w"
 name:str   = "HB9TPR"
 
 # Webserver
-port:int = 8080
+port:int = 80
 min_update_delay = 10 # Minimal delay between updating data
 
 # Balloon Info ( For Prediction )
