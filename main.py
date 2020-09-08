@@ -220,6 +220,8 @@ def getprediction() -> Optional[Tuple[Dict[str, float], str, str, bool, bool, AP
         t_hour:int =  timenow.hour
         t_min:int  =  timenow.minute
         t_sec:int  =  timenow.second
+
+        print(t_hour, t_min, t_sec)
         
         pred_data:Dict[str, Union[str, float, int]] = {
             "launchsite":  "Other",
