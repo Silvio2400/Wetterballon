@@ -45,6 +45,8 @@ DOWN:int = -1
 
 speed_values:List[float] = [0]
 
+diff_2h = datetime.timedelta(hours=2)
+
 
 visual_for_key:Dict[str, Tuple[str, str]] = {
     "temp": ("Temperature", "{key} C"),
@@ -61,7 +63,7 @@ lastdataupdatetime = None
 going:int = UP
 lastalt:float = 0.0
 neg_20_sec = datetime.timedelta(seconds=-20)
-lasttime:datetime.datetime = datetime.datetime.now() + neg_20_sec
+lasttime:datetime.datetime = datetime.datetime.now() + diff_2h + neg_20_sec
 
 lastuuid:str = ""
 lastloc:Optional[APRSLocation] =  None
@@ -161,7 +163,7 @@ def getprediction() -> Optional[Tuple[Dict[str, float], str, str, bool, bool, AP
             alt = 0
 
     if not usedlastloc:
-        timediff:datetime.timedelta = datetime.datetime.now() - lasttime
+        timediff:datetime.timedelta = (datetime.datetime.now() + diff_2h) - lasttime
 
         altdiff:float  = float(alt) - lastalt
 
@@ -173,7 +175,7 @@ def getprediction() -> Optional[Tuple[Dict[str, float], str, str, bool, bool, AP
             speed_values.append(cmps)
 
             lastalt = float(alt)
-            lasttime = datetime.datetime.now()
+            lasttime = datetime.datetime.now() + diff_2h
         
         mps:float = avg(speed_values)
     
@@ -207,7 +209,7 @@ def getprediction() -> Optional[Tuple[Dict[str, float], str, str, bool, bool, AP
         if going == UP:
             balloon_burst_mod = balloon_burst
         
-        now:datetime.datetime = datetime.datetime.now()
+        now:datetime.datetime = datetime.datetime.now() + diff_2h
         datenow:datetime.date = now.date()
         timenow:datetime.time = now.time()
 
@@ -300,7 +302,7 @@ class ReqHandler(SimpleHTTPRequestHandler):
         query_components = parse_qs(urlparse(self.path).query)
 
         if self.path == "/":
-            now = datetime.datetime.now()
+            now = datetime.datetime.now() + diff_2h
 
             if lastdataupdatetime == None or (now - lastdataupdatetime).total_seconds() >= min_update_delay:
                 lastdataupdatetime = now
