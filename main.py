@@ -6,8 +6,9 @@ loggingdelay:int =  120   # Time delay between adding data to log in seconds
 clearlog:bool =     True  # Clear log on startup
 
 # API Transmitter Info
-apikey:str = "146300.CJTqvO2lYIQu1w"
-name:str   = "HB9FWH"
+apikey:str      = "146300.CJTqvO2lYIQu1w" # API Key (aprs.fi)
+name:str        = "HB9FWH"                # Transmitter Callsign
+send_rate:float = 10                      # Delay between the transmitter sends location data in seconds
 
 # Webserver
 port:int = 80
@@ -20,7 +21,7 @@ donotchange_ascent:bool   = False # true if should not change ascent according t
 balloon_descent:float     = 5     # descent speed in m/s
 donotchange_descent:bool  = False # true if should not change descent according to GPS altitude value change over time
 
-balloon_burst:float       = 30000 # m     relative to sea level
+balloon_burst:float       = 30000 # height above sea level when balloon bursts in m
 # -------------------------------------------------------------- #
 
 from datetime import date
@@ -161,23 +162,25 @@ def getprediction() -> Optional[Tuple[Dict[str, float], str, str, bool, bool, AP
         else:
             print("altitude not being transmitted, predicting with a value of 0")
             alt = 0
-
-    if not usedlastloc:
-        timediff:datetime.timedelta = (datetime.datetime.now() + diff_2h) - lasttime
-
-        altdiff:float  = float(alt) - lastalt
-
-        if timediff.total_seconds() >= 20 or altdiff != 0.0:
-            cmps:float = altdiff / timediff.total_seconds()
-
-            if len(speed_values) >= 5:
-                speed_values.remove(speed_values[0])
-            speed_values.append(cmps)
-
-            lastalt = float(alt)
-            lasttime = datetime.datetime.now() + diff_2h
         
-        mps:float = avg(speed_values)
+    timediff:datetime.timedelta = (datetime.datetime.now() + diff_2h) - lasttime
+
+    altdiff:float  = float(alt) - lastalt
+
+    cmps:float = altdiff / timediff.total_seconds()
+
+    if timediff.total_seconds() >= 20 or altdiff != 0.0:
+
+        if len(speed_values) >= 5:
+            speed_values.remove(speed_values[0])
+        speed_values.append(cmps)
+
+        lastalt = float(alt)
+        lasttime = datetime.datetime.now() + diff_2h
+    
+    mps:float = avg(speed_values)
+    
+    if not usedlastloc:
     
         if mps > 0:
             print(f"according to GPS, balloon going up with an average speed of {mps} m/s")
@@ -289,7 +292,7 @@ def getprediction() -> Optional[Tuple[Dict[str, float], str, str, bool, bool, AP
     
     lastuuid = uuid
     
-    return {"lat": lat, "lon": lng, "alt": alt},kml,uuid,usedlastloc,usedlastwx,loc,wx
+    return {"lat": lat, "lon": lng, "alt": alt},kml,uuid,usedlastloc,usedlastwx,loc,wx,cmps
 
 
 class ReqHandler(SimpleHTTPRequestHandler):
@@ -315,18 +318,25 @@ class ReqHandler(SimpleHTTPRequestHandler):
                 usedlastwx:bool
                 loc:Optional[APRSLocation]
                 wx:Optional[APRSWeather]
-                data,kml,uuid,usedlastloc,usedlastwx,loc,wx = getprediction()
+                data,kml,uuid,usedlastloc,usedlastwx,loc,wx,cmps = getprediction()
                 with open("index.html", "r") as page:
                     dat:str
                     dat = page.read()
                     dat = dat.replace("CENTER_LAT", str(data["lat"]))
                     dat = dat.replace("CENTER_LNG", str(data["lon"]))
                     dat = dat.replace("PLAN_KML_UUID", uuid)
-                    if usedlastloc:
+                    lastheard = (datetime.datetime.fromtimestamp(int(loc["lasttime"])) - datetime.datetime.now()).total_seconds()
+                    if usedlastloc or lastheard > send_rate + 15:
                         dat = dat.replace("WARNING_HIDDEN", "")
                     else:
                         dat = dat.replace("WARNING_HIDDEN", "hidden")
+                    if going == DOWN:
+                        dat = dat.replace("GOINGDOWN_HIDDEN", "")
+                        dat = dat.replace("SPEED", str(cmps))
+                    else:
+                        dat = dat.replace("GOINGDOWN_HIDDEN", "hidden")
                     
+                    dat = dat.replace("UUID", uuid)
                     html:str = """
                             <tr>
                                 <th><span class="senstext">{name}</span></th>
@@ -350,18 +360,20 @@ class ReqHandler(SimpleHTTPRequestHandler):
                             nm,sfx = visual_for_key[s]
                             m = {"name": nm, "value": sfx.format_map(dict(key=str(v)))}
                             fhtml += html.format_map(m)
-                            if s == "pressure":
+                            if False:# s == "pressure":
                                 pressureadded = True
                                 m = {"name": "Pressure (Altitude)", "value": str(int((101325 * (1 - 2.25577 * 10**-5 * alt) ** 5.25588) / 100)) + " mbar"}
                                 fhtml += html.format_map(m)
                         except KeyError:pass
-                    if False:#not pressureadded:
+                    if False:# not pressureadded:
                         m = {"name": "Pressure (Altitude)", "value": str( (101325 * (1 - 2.25577 * 10**-5 * alt) ** 5.25588) / 100 ) + " mbar"}
                         fhtml += html.format_map(m)
-                    m = {"name": "Altitude", "value": str(alt)}
+                    
+                    m = {"name": "Last heard", "value": str(lastheard) + " Secs ago"}
                     fhtml += html.format_map(m)
-                    dat = dat.replace("SENSOR_VALUES", fhtml)
 
+                    dat = dat.replace("SENSOR_VALUES", fhtml)
+                    
                     root:ET.Element = ET.fromstring(kml)
                     doc:ET.Element = list(root)[0]
                     for elem in list(doc):
@@ -382,7 +394,7 @@ class ReqHandler(SimpleHTTPRequestHandler):
                                     elif elem3.tag.endswith("description"):
                                         dt:str = elem3.text.split("at ")[2].replace(".", "")
                                         dat = dat.replace("DEST_DATETIME", dt)
-                        
+                    
 
                     self.wfile.write(bytes(dat, "utf8"))
                     with open("lastindex.html", "w") as f:

@@ -102,27 +102,36 @@
         <div class="warndiv" hidden>
           <span class="warntext">Warning: no connection to device</span>
         </div>
+        <div class="warndiv" hidden>
+          <span class="warntext">Warning: balloon's altitude decreasing by SPEED m/s</span>
+        </div>
         <div class="mapcontainer" id="mapContainer"></div>
         <table>
           
                             <tr>
                                 <th><span class="senstext">Course</span></th>
-                                <th><span class="sensvalue">283&deg;</span></th>
+                                <th><span class="sensvalue">135&deg;</span></th>
                             </tr>
                             <tr>
                                 <th><span class="senstext">Speed</span></th>
-                                <th><span class="sensvalue">59 km/h</span></th>
+                                <th><span class="sensvalue">75.932 km/h</span></th>
                             </tr>
                             <tr>
-                                <th><span class="senstext">Altitude</span></th>
-                                <th><span class="sensvalue">418.00</span></th>
+                                <th><span class="senstext">Last heard</span></th>
+                                <th><span class="sensvalue">-21.425632 Secs ago</span></th>
                             </tr>
         </table>
         <div class="linkdiv">
-          <a target="_blank" class="link" href="https://www.google.com/maps/search/?api=1&query=47.3058,8.64555">Destination ( 17:12 01/09/2020 )</a>
+          <a target="_blank" class="link" href="https://www.google.com/maps/search/?api=1&query=47.4612,8.98334">Destination ( 21:59 10/09/2020 )</a>
+        </div>
+        <div class="linkdiv">
+          <a target="_blank" class="link" href="https://www.google.com/maps/search/?api=1&query=47.24100,8.60800">Current Balloon position</a>
         </div>
         <div class="linkdiv">
           <a class="link" href="/plan.kml" download>Download KML</a>
+        </div>
+        <div class="linkdiv">
+          <a class="link" href="http://predict.habhub.org/#!/uuid=22fb4517138df3c1c41385fa4b7c0b4ce78a346e" download>View prediction on official website (predict.habhub.org)</a>
         </div>
       </div>
     </div>
@@ -142,7 +151,7 @@
           maptypes.vector.normal.map,
           {
             zoom: 9,
-            center: { lng: 8.41167, lat: 47.39483 },
+            center: { lng: 8.60800, lat: 47.24100 },
             pixelRatio: 3
           }
         );
