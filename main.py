@@ -325,8 +325,8 @@ class ReqHandler(SimpleHTTPRequestHandler):
                     dat = dat.replace("CENTER_LAT", str(data["lat"]))
                     dat = dat.replace("CENTER_LNG", str(data["lon"]))
                     dat = dat.replace("PLAN_KML_UUID", uuid)
-                    lastheard = (datetime.datetime.fromtimestamp(int(loc["lasttime"])) - datetime.datetime.now()).total_seconds()
-                    if usedlastloc or lastheard > send_rate + 15:
+                    lastheard = (datetime.datetime.now() - datetime.datetime.fromtimestamp(int(loc["lasttime"]))).total_seconds()
+                    if usedlastloc or lastheard > send_rate + 60:
                         dat = dat.replace("WARNING_HIDDEN", "")
                     else:
                         dat = dat.replace("WARNING_HIDDEN", "hidden")
