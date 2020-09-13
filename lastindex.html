@@ -99,7 +99,7 @@
   <body onload="loadmap();" style="background-color: grey;">
     <div class="container">
       <div>
-        <div class="warndiv" hidden>
+        <div class="warndiv" >
           <span class="warntext">Warning: no connection to device</span>
         </div>
         <div class="warndiv" hidden>
@@ -118,14 +118,14 @@
                             </tr>
                             <tr>
                                 <th><span class="senstext">Last heard</span></th>
-                                <th><span class="sensvalue">-21.425632 Secs ago</span></th>
+                                <th><span class="sensvalue">643.944652 Secs ago</span></th>
                             </tr>
         </table>
         <div class="linkdiv">
           <a target="_blank" class="link" href="https://www.google.com/maps/search/?api=1&query=47.4612,8.98334">Destination ( 21:59 10/09/2020 )</a>
         </div>
         <div class="linkdiv">
-          <a target="_blank" class="link" href="https://www.google.com/maps/search/?api=1&query=47.24100,8.60800">Current Balloon position</a>
+          <a target="_blank" class="link" href="https://www.google.com/maps/search/?api=1&query=0.0,0.0">Current Balloon position</a>
         </div>
         <div class="linkdiv">
           <a class="link" href="/plan.kml" download>Download KML</a>
@@ -151,7 +151,7 @@
           maptypes.vector.normal.map,
           {
             zoom: 9,
-            center: { lng: 8.60800, lat: 47.24100 },
+            center: { lng: 0.0, lat: 0.0 },
             pixelRatio: 3
           }
         );
