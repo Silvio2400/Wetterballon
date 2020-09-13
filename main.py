@@ -304,8 +304,6 @@ class ReqHandler(SimpleHTTPRequestHandler):
 
         self.end_headers()
 
-        query_components = parse_qs(urlparse(self.path).query)
-
         if self.path == "/":
             now = datetime.datetime.now() + diff_2h
 
@@ -451,19 +449,23 @@ class ReqHandler(SimpleHTTPRequestHandler):
             with open("manualcoords.html", "r") as page:
                 self.wfile.write(bytes(page.read(), "utf-8"))
             return
-        
+    def do_POST(self) -> None:
+        query_components = parse_qs(urlparse(self.path).query)
+
         if self.path.startswith("/submitcoords"):
             try:
                 lat = query_components["lat"][0]
                 lng = query_components["lng"][0]
             except KeyError:
                 print("Invalid query components:", query_components)
+                self.wfile.write(bytes(f"Invalid query components: {str(query_components)}", "utf-8"))
                 return
             try:
                 lat = float(lat)
                 lng = float(lng)
-            except:
+            except ValueError:
                 print("Invalid query components:", query_components)
+                self.wfile.write(bytes(f"Invalid query components: {str(query_components)}", "utf-8"))
                 return
 
             
@@ -476,6 +478,8 @@ class ReqHandler(SimpleHTTPRequestHandler):
 
             datadec["loc"]["lat"] = str(lat)
             datadec["loc"]["lng"] = str(lng)
+            now = datetime.datetime.now()
+            datadec["loc"]["lasttime"] = str(now.timestamp())
             
             dat = jsonenc.encode(datadec)
 
@@ -485,6 +489,8 @@ class ReqHandler(SimpleHTTPRequestHandler):
             f.write(dat)
             f.flush()
             f.close()
+            self.wfile.write(bytes("OK", "utf-8"))
+
 
 
 
