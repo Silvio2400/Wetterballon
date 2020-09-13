@@ -450,19 +450,20 @@ class ReqHandler(SimpleHTTPRequestHandler):
                 self.wfile.write(bytes(page.read(), "utf-8"))
             return
     def do_POST(self) -> None:
-        query_components = parse_qs(urlparse(self.path).query)
+        query_components = parse_qs(self.rfile.read())
 
+        print(query_components)
         if self.path.startswith("/submitcoords"):
             try:
-                lat = query_components["lat"][0]
-                lng = query_components["lng"][0]
+                lat = query_components[b"lat"][0]
+                lng = query_components[b"lng"][0]
             except KeyError:
                 print("Invalid query components:", query_components)
                 self.wfile.write(bytes(f"Invalid query components: {str(query_components)}", "utf-8"))
                 return
             try:
-                lat = float(lat)
-                lng = float(lng)
+                lat = float(lat.decode())
+                lng = float(lng.decode())
             except ValueError:
                 print("Invalid query components:", query_components)
                 self.wfile.write(bytes(f"Invalid query components: {str(query_components)}", "utf-8"))
