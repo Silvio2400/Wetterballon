@@ -454,8 +454,8 @@ class ReqHandler(SimpleHTTPRequestHandler):
         
         if self.path.startswith("/submitcoords"):
             try:
-                lat = query_components["lat"]
-                lng = query_components["lng"]
+                lat = query_components["lat"][0]
+                lng = query_components["lng"][0]
             except KeyError:
                 print("Invalid query components:", query_components)
                 return
