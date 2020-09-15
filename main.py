@@ -462,6 +462,8 @@ class ReqHandler(SimpleHTTPRequestHandler):
             try:
                 lat = query_components["lat"][0]
                 lng = query_components["lng"][0]
+                alt = query_components["alt"][0]
+
             except KeyError:
                 print("Invalid query components:", query_components)
                 self.wfile.write(bytes(f"Invalid query components: {str(query_components)}", "utf-8"))
@@ -469,6 +471,8 @@ class ReqHandler(SimpleHTTPRequestHandler):
             try:
                 lat = float(lat)
                 lng = float(lng)
+                lng = float(lng)
+                
             except ValueError:
                 print("Invalid query components:", query_components)
                 self.wfile.write(bytes(f"Invalid query components: {str(query_components)}", "utf-8"))
@@ -484,6 +488,8 @@ class ReqHandler(SimpleHTTPRequestHandler):
 
             datadec["loc"]["lat"] = str(lat)
             datadec["loc"]["lng"] = str(lng)
+            datadec["loc"]["altitude"] = str(alt)
+
             now = datetime.datetime.now()
             datadec["loc"]["lasttime"] = str(int(now.timestamp()))
             
