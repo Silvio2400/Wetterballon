@@ -132,7 +132,7 @@ def setlastdata(key:str, value:Union[str, APRSLocation, APRSWeather]) -> None:
     f.flush()
     f.close()
 
-def getprediction() -> Optional[Tuple[Dict[str, float], str, str, bool, bool, APRSLocation, APRSWeather]]:
+def getprediction(predict_anyways=False) -> Optional[Tuple[Dict[str, float], str, str, bool, bool, APRSLocation, APRSWeather]]:
     global lastuuid,lastloc,lastalt,going,lasttime,speed_values,balloon_ascent,balloon_descent
     loc:Optional[APRSLocation]
 
@@ -206,7 +206,7 @@ def getprediction() -> Optional[Tuple[Dict[str, float], str, str, bool, bool, AP
         print("longitude not being transmitted, failed to predict")
         return
     
-    if not usedlastloc:
+    if not usedlastloc or predict_anyways:
         if going == DOWN:
             balloon_burst_mod = alt - 5
         if going == UP:
@@ -506,6 +506,8 @@ class ReqHandler(SimpleHTTPRequestHandler):
             f.flush()
             f.close()
             self.wfile.write(bytes("OK", "utf-8"))
+
+            getprediction(True)
 
 
 
