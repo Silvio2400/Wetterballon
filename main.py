@@ -265,6 +265,7 @@ def getprediction(predict_anyways=False) -> Optional[Tuple[Dict[str, float], str
             encdata:bytes = resp.read()
             pred_progress:Dict[str, Union[bool, str, List[str]]] = jsondec.decode(encdata.decode())
         while not pred_progress["pred_complete"]:
+            print("Complete?")
             if pred_progress["error"] != "":
                 error:str = pred_progress["error"]
                 print(f"Gathering progress data failed: {error}")
