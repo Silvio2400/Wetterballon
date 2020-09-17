@@ -7,7 +7,7 @@ clearlog:bool =     True  # Clear log on startup
 
 # API Transmitter Info
 apikey:str      = "146300.CJTqvO2lYIQu1w" # API Key (aprs.fi)
-name:str        = "HB9FWH"                # Transmitter Callsign
+name:str        = "HB9FWH-7"                # Transmitter Callsign
 send_rate:float = 10                      # Delay between the transmitter sends location data in seconds
 
 # Webserver
