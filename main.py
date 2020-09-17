@@ -490,12 +490,16 @@ class ReqHandler(SimpleHTTPRequestHandler):
             datadec["loc"]["lng"] = str(lng)
             datadec["loc"]["altitude"] = str(alt)
 
+            
+
             now = datetime.datetime.now()
             datadec["loc"]["lasttime"] = str(int(now.timestamp()))
             
             dat = jsonenc.encode(datadec)
 
             logdata(datadec["loc"], None)
+
+            lastloc = datadec
 
             f = open("lastdata.json", "w")
             f.write(dat)
