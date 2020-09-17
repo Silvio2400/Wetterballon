@@ -298,7 +298,7 @@ def getprediction(predict_anyways=False) -> Optional[Tuple[Dict[str, float], str
 class ReqHandler(SimpleHTTPRequestHandler):
     path:str
     def do_GET(self) -> None:
-        global lastdataupdatetime
+        global lastdataupdatetime,lastloc
         self.send_response(200)
         self.send_header("Content-type", "text/html")
 
